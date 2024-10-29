@@ -1,16 +1,24 @@
 import streamlit as st
+import openai
+
+openai.api_key = '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'  # Replace with your actual OpenAI API key
 
 def calculate_bmi(weight, height):
     return weight / (height ** 2)
 
 def suggest_recipes(calories):
-    # Placeholder for recipe suggestions based on calorie intake
-    if calories < 1500:
-        return ["Salad", "Grilled Chicken", "Vegetable Soup"]
-    elif 1500 <= calories < 2500:
-        return ["Pasta", "Stir Fry", "Tacos"]
-    else:
-        return ["Burger", "Pizza", "Steak"]
+    # Use GPT API to suggest recipes based on calorie intake
+    prompt = f"Suggest some recipes for a daily calorie intake of {calories} calories."
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=1000
+    )
+    recipes = response.choices[0].message['content'].strip().split('\n')
+    return recipes
 
 st.title("Cook and Count")
 
