@@ -20,7 +20,7 @@ def suggest_recipes(calories):
     recipes = response.choices[0].message['content'].strip().split('\n')
     return recipes
 
-st.title("Cook and Count")
+st.title("Cook and Count with GPT integration")
 
 st.header("Calculate Your BMI")
 weight = st.number_input("Enter your weight in kg", min_value=0.0, step=0.1)
