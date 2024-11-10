@@ -1,24 +1,7 @@
-import http.client
-import requests
+# tasty_api.py
 
-# Establish HTTPS connection with Tasty API
-conn = http.client.HTTPSConnection("tasty.p.rapidapi.com")
+import requests  # <-- Make sure this is imported in tasty_api.py
 
-headers = {
-    'x-rapidapi-key': "ecc1488b07msh461cab2c4a46cfap1084ecjsn7a46b99f3586",
-    'x-rapidapi-host': "tasty.p.rapidapi.com"
-}
-
-# Request to fetch recipes
-conn.request("GET", "/recipes/list?from=0&size=20&tags=under_30_minutes", headers=headers)
-
-res = conn.getresponse()
-data = res.read()
-
-# Display data from the response
-print(data.decode("utf-8"))  # Removed max_tokens argument
-
-# Define a function to search API
 def searchapi():
     url = "https://tasty.p.rapidapi.com/recipes/list"
     querystring = {"from": "0", "size": "20", "tags": "under_30_minutes"}
@@ -29,6 +12,8 @@ def searchapi():
     }
 
     response = requests.get(url, headers=headers, params=querystring)
-    
-    # Print JSON response from API
-    print(response.json())
+    data = response.json()
+
+    # Extract recipe names to display
+    recipes = [recipe['name'] for recipe in data.get("results", [])]  # <-- Update: Collect recipe names
+    return recipes  # <-- Update: Return the list of recipes instead of printing
