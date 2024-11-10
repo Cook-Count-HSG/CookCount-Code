@@ -1,16 +1,13 @@
 import streamlit as st
-import tasty
 import http.client
 import requests
 
-tasty.api_key = 'ecc1488b07msh461cab2c4a46cfap1084ecjsn7a46b99f3586'
 
 def calculate_bmi(weight, height):
     return weight / (height ** 2)
 
 def suggest_recipes(calories):
     # Use Tasty API to suggest recipes based on calorie intake
-
 
     conn = http.client.HTTPSConnection("tasty.p.rapidapi.com")
 
