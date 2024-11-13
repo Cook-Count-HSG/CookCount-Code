@@ -3,10 +3,13 @@ from turtle import right
 import streamlit as st
 from tasty_api import searchapi  # <-- Add this import to bring in the searchapi function
 
+if 'mode' not in st.session_state:
+    st.session_state['mode'] = 'create_user_profile'
+
 #Streamlit App Code
 #Step 1: User Profile Creation and BMI/BMR calculation 
 
-def create_user_profile (): 
+def create_user_profile(): 
     st.header("User Profile")
     first_name = st.text_input("Enter your first name")
     last_name = st.text_input("Enter your last name") 
@@ -23,18 +26,20 @@ def create_user_profile ():
         else: 
             bmr = 655.1 + (9.6 * weight) + (1.8 * height) - (4.7 * age)
 
-    user_data = { 
-        "name" : f"{first_name} {last_name}",
-        "age" : age, 
-        "gender" : gender, 
-        "BMI" : bmi, 
-        "BMR" : bmr
-    }
+        user_data = { 
+            "name" : f"{first_name} {last_name}",
+            "age" : age, 
+            "gender" : gender, 
+            "BMI" : bmi, 
+            "BMR" : bmr
+        }
 
-    #Display and save user profile in json file 
-    st.write (f"Profile is saved! Your BMI is {bmi:.2f} and your BMR is {bmr:.2f}")
-    with open ("user_profile.json", "w") as f:
-        json.dump (user_data, f)
+        #Display and save user profile in json file 
+        st.write (f"Profile is saved! Your BMI is {bmi:.2f} and your BMR is {bmr:.2f}")
+        with open ("user_profile.json", "w") as f:
+            json.dump (user_data, f)
+        st.session_state['mode'] = 'set_fitness_goal'
+        set_fitness_goal()
 
 
 #Step 2: Fitness Goal and Calorie Adjustment based on PAL, Exercise and Calorie Goal  
@@ -61,7 +66,7 @@ def set_fitness_goal():
     else: 
             calorie_adjustment = 0 #No adjustment for weight maintain
     
-    #Step 2.3: Select Physical Activity Level (PAL)
+     #Step 2.3: Select Physical Activity Level (PAL)
     st.header("Physical Activity Level (PAL)")
     activity_level = st.selectbox ("Select your activity level", [
         "Sedentary (e.g., elderly) – PAL: 1.2",
@@ -71,48 +76,53 @@ def set_fitness_goal():
         "Physically demanding work (e.g., manual labor) – PAL: 2.2"
     ])
     
-    #Step 2.4: Assign PAL value based on selection
-    pal_dict = {
-        "Sedentary (e.g., elderly) – PAL: 1.2": 1.2,
-        "Mostly sedentary (e.g., office job) – PAL: 1.4": 1.4,
-        "Moderate movement (e.g., students) – PAL: 1.6": 1.6,
-        "Standing work (e.g., professors) – PAL: 1.8": 1.8,
-        "Physically demanding work (e.g., manual labor) – PAL: 2.2": 2.2
-    }
-    pal = pal_dict[activity_level]
-    
     #Step 2.5: Weekly Exercise Adjustment
     st.header("Weekly Exercise")
     hours_of_sport = st.number_input("Enter hours of exercise per week", min_value=0.0, step=0.5)
-    exercise_adjustment = pal * 0.05 * hours_of_sport
-
-    #Step 2.6: Total Daily Expenditure and Caloric Goal Calculation
-    energy_expenditure = 2000 # Placeholder for a base energy expenditure, adjust as needed
-    total_daily_expenditure = energy_expenditure + exercise_adjustment
-    goal_calories = total_daily_expenditure + calorie_adjustment
     
-    #Step 2.7: Display results
-    st.write(f"With your activity level and exercise, your daily caloric expenditure is: {total_daily_expenditure:.2f} calories.")
-    st.write(f"To reach your fitness goal, your daily calorie target should be: {goal_calories:.2f} calories.")
-    
-    #Step 2.8: Save fitness goal and calorie adjustment in json file
-    fitness_data = {
-         "fitness_goal": fitness_goal, 
-         "target_amount": target_amount, 
-         "time_period": time_period, 
-         "activity_level": activity_level, 
-         "pal": pal, 
-         "hours_of_sport": hours_of_sport, 
-         "exercise_adjustment": exercise_adjustment,
-         "total_daily_expenditure": total_daily_expenditure, 
-         "goal_calories": goal_calories
-    }
-
     if st.button("Save Fitness Goal"): 
+        #Step 2.4: Assign PAL value based on selection
+        pal_dict = {
+            "Sedentary (e.g., elderly) – PAL: 1.2": 1.2,
+            "Mostly sedentary (e.g., office job) – PAL: 1.4": 1.4,
+            "Moderate movement (e.g., students) – PAL: 1.6": 1.6,
+            "Standing work (e.g., professors) – PAL: 1.8": 1.8,
+            "Physically demanding work (e.g., manual labor) – PAL: 2.2": 2.2
+        }
+        pal = pal_dict[activity_level]     
+
+        exercise_adjustment = pal * 0.05 * hours_of_sport
+
+        #Step 2.6: Total Daily Expenditure and Caloric Goal Calculation
+        energy_expenditure = 2000 # Placeholder for a base energy expenditure, adjust as needed
+        total_daily_expenditure = energy_expenditure + exercise_adjustment
+        goal_calories = total_daily_expenditure + calorie_adjustment
+
+        #Step 2.7: Display results
+        st.write(f"With your activity level and exercise, your daily caloric expenditure is: {total_daily_expenditure:.2f} calories.")
+        st.write(f"To reach your fitness goal, your daily calorie target should be: {goal_calories:.2f} calories.")
+        
+        #Step 2.8: Save fitness goal and calorie adjustment in json file
+        fitness_data = {
+            "fitness_goal": fitness_goal, 
+            "target_amount": target_amount, 
+            "time_period": time_period, 
+            "activity_level": activity_level, 
+            "pal": pal, 
+            "hours_of_sport": hours_of_sport, 
+            "exercise_adjustment": exercise_adjustment,
+            "total_daily_expenditure": total_daily_expenditure, 
+            "goal_calories": goal_calories
+        }
+
+        # save in json
         with open("fitness_goal.json", "w") as f:
              json.dump(fitness_data, f)
         st.write("Your fitness goal details have been saved.")
-        
+        st.session_state['mode'] = 'define_calories'
+        define_calories()
+    
+            
 #Step 3: Set up digital fridge
 digital_fridge = {
     "Meat & Fish": ["Beef", "Chicken", "Pork", "Lamb", "Trout", "Cod", "Salmon", "Tuna"],
@@ -168,16 +178,29 @@ def add_to_fridge():
         for fridge_item in user_fridge:
             st.write(f"- {fridge_item}")
 
-def suggest_recipes(calories):
+def suggest_recipes(calories, food):
     # Use searchapi function to get recipes from the Tasty API
-    recipes = searchapi()  # <-- Update: Call the searchapi function to get recipes
+    recipes = searchapi(food)  # <-- Update: Call the searchapi function to get recipes
     return recipes  # <-- Update: Return the recipes list
 
-st.header("Track Your Daily Calories")
-calories = st.number_input("Enter your daily calorie intake", min_value=0, step=1)
+def define_calories():
+    st.header("Track Your Daily Calories")
+    calories = st.number_input("Enter your daily calorie intake", min_value=0, step=1)
+    food = st.text_input("what do you want?")
 
-if st.button("Suggest Recipes"):
-    recipes = suggest_recipes(calories)  # <-- Update: Call suggest_recipes to get recipe list
-    st.write("Here are some recipe suggestions for you:")
-    for recipe in recipes:
-        st.write(f"- {recipe}")  # <-- Display each recipe in Streamlit
+    if st.button("Suggest Recipes"):
+        recipes = suggest_recipes(calories, food)  # <-- Update: Call suggest_recipes to get recipe list
+        st.write("Here are some recipe suggestions for you:")
+        for recipe in recipes:
+            st.write(f"- {recipe}")  # <-- Display each recipe in Streamlit
+        add_to_fridge()
+     
+
+# Frontend
+
+if st.session_state['mode'] == "create_user_profile":
+    create_user_profile()
+elif st.session_state['mode'] == "set_fitness_goal":
+     set_fitness_goal()
+elif st.session_state['mode'] == "define_calories":
+     define_calories()
