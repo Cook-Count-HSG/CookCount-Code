@@ -1,3 +1,4 @@
+import json
 from turtle import right
 import streamlit as st
 from tasty_api import searchapi  # <-- Add this import to bring in the searchapi function
@@ -9,7 +10,7 @@ def create_user_profile ():
     st.header("User Profile")
     first_name = st.text_input("Enter your first name")
     last_name = st.text_input("Enter your last name") 
-    gender = st.selextbox("Select your gender", ["Male", "Female"])
+    gender = st.selectbox("Select your gender", ["Male", "Female"])
     age = st.number_input ("Enter you age", min_value = 0, step=1)
     weight = st.number_input ("Enter your weight in kg", min_value = 0.0, step= 0.1) #Set min_value > 0 
     height = st.number_input ("Enter your height in cm", min_value = 0.0, step= 0.1) #Set min_value > 0 
@@ -166,7 +167,6 @@ def add_to_fridge():
         st.write("Your current fridge contents:")
         for fridge_item in user_fridge:
             st.write(f"- {fridge_item}")
-
 
 def suggest_recipes(calories):
     # Use searchapi function to get recipes from the Tasty API
