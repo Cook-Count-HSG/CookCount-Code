@@ -14,6 +14,4 @@ def searchapi(food):
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
 
-    # Extract recipe names to display
-    recipes = [recipe['name'] for recipe in data.get("results", [])]  # <-- Update: Collect recipe names
-    return recipes  # <-- Update: Return the list of recipes instead of printing
+    return data.get("results", [])
