@@ -14,9 +14,9 @@ def create_user_profile():
     first_name = st.text_input("Enter your first name")
     last_name = st.text_input("Enter your last name") 
     gender = st.selectbox("Select your gender", ["Male", "Female"])
-    age = st.number_input ("Enter you age", min_value = 0, step=1)
-    weight = st.number_input ("Enter your weight in kg", min_value = 0.0, step= 0.1) # Set min_value > 0 
-    height = st.number_input ("Enter your height in cm", min_value = 0.0, step= 0.1) # Set min_value > 0 
+    age = st.number_input ("Enter you age", min_value = 1, step=1)
+    weight = st.number_input ("Enter your weight in kg", min_value = 0.1, step= 0.1) # Set min_value > 0.1 
+    height = st.number_input ("Enter your height in cm", min_value = 0.1, step= 0.1) # Set min_value > 0.1
 
     if st.button("Save Profile"): # Calculate BMI and BMR in the background to display it after the User Profile was saved instead of doing it partly 
         
