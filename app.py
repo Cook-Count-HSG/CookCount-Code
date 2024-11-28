@@ -21,10 +21,13 @@ def create_user_profile():
     if st.button("Save Profile"): # Calculate BMI and BMR in the background to display it after the User Profile was saved instead of doing it partly 
         
         bmi = weight / ((height / 100) ** 2)
-        if gender.lower() == "male":
-            bmr = 66.47 + (13.7 * weight) + (5 * height) - (6.8 * age)
-        else: 
-            bmr = 655.1 + (9.6 * weight) + (1.8 * height) - (4.7 * age)
+
+        def calculate_bmr(gender, weight, height, age):
+            if gender.lower() == "male":
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+            else:  # Assumes gender is "female"
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
+            return bmr
 
         user_data = { 
             "name" : f"{first_name} {last_name}",
