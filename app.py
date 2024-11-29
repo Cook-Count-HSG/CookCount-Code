@@ -1,8 +1,9 @@
 import json
 from turtle import right
 import streamlit as st
-from tasty_api import searchapi  # <-- Add this import to bring in the searchapi function
-
+from tasty_api import searchapi # <-- Add this import to bring in the searchapi function
+import pandas as pd
+import plotly.express as px
 
 # Set view state
 if 'mode' not in st.session_state:
@@ -28,6 +29,8 @@ def create_user_profile():
             else:  # Assumes gender is "female"
                 bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
             return bmr
+        
+        bmr = calculate_bmr(gender, weight, height, age)
 
         user_data = { 
             "name" : f"{first_name} {last_name}",
@@ -37,16 +40,70 @@ def create_user_profile():
             "BMR" : bmr
         }
 
-        # Display and save user profile in json file 
-        st.write (f"Profile is saved! Your BMI is {bmi:.2f} and your BMR is {bmr:.2f}")
+        # Display user profile 
+        st.write (f"Profile is saved!")
+        st.write (f"Your BMI is **{bmi:.2f}** and your BMR is **{bmr:.2f}**")
+
+        #Calculate normal BMI range for gender
+        if gender == 'Male':
+            df = pd.DataFrame({ 
+                "BMI": [20, 4.9, 5, 5, 5, 10],
+            })
+        elif gender == 'Female':
+            df = pd.DataFrame({ 
+                "BMI": [19, 4.9, 6, 5, 5, 10],
+            })
+        else:
+            raise ValueError
+
+        df['single_bar'] = 'BMI'
+
+        #Create a bar chart with the BMI range and user-specific BMI
+        fig = px.bar(
+            df,
+            x='BMI',
+            y='single_bar',
+            color=["Underweight", "Normal weight", "Overweight", "Serverly Overweight (Obesity Grade I)", "Obesity Grade II", "Obesity Grade III"],
+            color_discrete_map=
+            {
+                'Underweight': '#89CFF0',
+                'Normal weight': '#3FAD51',
+                'Overweight': '#F3E85A',
+                'Serverly Overweight (Obesity Grade I)': '#FFC000',
+                'Obesity Grade II': '#FF8400',
+                'Obesity Grade III': '#AA0000'
+            },
+            orientation='h',
+            height=300
+        )
+
+        #Adjustments to the layout of the chart
+        fig.update_yaxes(visible=False, showticklabels=False)
+        fig.add_vline(x=bmi)
+        fig.add_annotation(x=bmi -2.75, y=.3, text="Your BMI", showarrow=False)
+        fig.update_layout(hovermode=False)
+        fig.update_traces(width=.25)
+        fig.update_layout(xaxis=dict(showgrid=False),
+                    yaxis=dict(showgrid=False)
+        )
+        fig.update_layout({
+            'plot_bgcolor': '#FFFFFF',
+            'paper_bgcolor': '#FFFFFF',
+        })
+        fig.update_layout(legend_title_text='BMI Level')
+
+        #Display the chart in streamlit
+        st.plotly_chart(fig)
+
+        # Save user profile in json file
         with open ("user_profile.json", "w") as f:
             json.dump (user_data, f)
         st.session_state['mode'] = 'set_fitness_goal'
-        set_fitness_goal()
+        set_fitness_goal(weight=weight)
 
 
 # Step 2: Fitness Goal and Calorie Adjustment based on PAL, Exercise and Calorie Goal  
-def set_fitness_goal():
+def set_fitness_goal(weight: int):
     st.header("Set Your Fitness Goal")
 
     # Step 2.1: Select fitness goal out of 3 options and target 
@@ -103,7 +160,44 @@ def set_fitness_goal():
         # Step 2.7: Display results
         st.write(f"With your activity level and exercise, your daily caloric expenditure is: {total_daily_expenditure:.2f} calories.")
         st.write(f"To reach your fitness goal, your daily calorie target should be: {goal_calories:.2f} calories.")
-        
+
+        #Calculate daily protein, fat and carbs intake in grams based on the goal calories
+        protein = round(1.5 * weight)
+        protein_kcals = protein * 5.1
+        fat = round(0.7 * weight)
+        fat_kcals = fat * 9
+        carbs_kcals =  goal_calories - protein_kcals - fat_kcals
+        carbs = round(carbs_kcals / 5.1)
+
+        #Create a dataframe to be used in the pie chart
+        df = pd.DataFrame({
+            "Type": ["Protein", "Carbs", "Fat"],
+            "Calories": [protein, carbs, fat]
+        })
+
+        #Create a pie chart that displays the daily intake of protein, fat and carbs
+        fig = px.pie(
+            df, 
+            values='Calories', 
+            names='Type',
+            title=f'Grams of Protein, Fat and Carbs for a {goal_calories} Calorie Diet',
+            category_orders={"Type": df["Type"].tolist()},
+            width=650,
+            height=400
+        )
+
+        #Adjustments to the layout of the chart
+        fig.update_layout(hovermode=False)
+        fig.update_traces(
+            textinfo='value',
+            texttemplate='%{value}g (%{percent})',  # Adds "g" to the data labels
+            marker=dict(colors=['#A52019', '#3E5982', '#E1A100']),
+            sort=False
+        ) 
+
+        #Display the chart in streamlit
+        st.plotly_chart(fig)
+
         # Step 2.8: Save fitness goal and calorie adjustment in json file
         fitness_data = {
             "fitness_goal": fitness_goal, 
@@ -199,7 +293,7 @@ def define_calories():
 
         for i, recipe in enumerate(recipes):
             with st.expander(recipe["name"]):
-                st.image(recipe["thumbnail_url"], caption=recipe["name"], use_container_width=True)
+                st.image(recipe["thumbnail_url"], caption=recipe["name"])
                 st.markdown(f"**Description:** {recipe['description']}")
                 st.markdown(f"**Prep Time:** {recipe['prep_time_minutes']} minutes")
                 st.markdown(f"**Total Time:** {recipe['total_time_minutes']} minutes")
@@ -215,6 +309,6 @@ def define_calories():
 if st.session_state['mode'] == "create_user_profile":
     create_user_profile()
 elif st.session_state['mode'] == "set_fitness_goal":
-     set_fitness_goal()
+     set_fitness_goal(weight=80) #Take from JSON file instead of hardcoded value
 elif st.session_state['mode'] == "define_calories":
      define_calories()
