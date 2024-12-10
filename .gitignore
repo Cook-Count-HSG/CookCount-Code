@@ -17,6 +17,8 @@ lib64/
 parts/
 sdist/
 var/
+__pycache__/
+.vscode/
 *.egg-info/
 .installed.cfg
 *.egg
