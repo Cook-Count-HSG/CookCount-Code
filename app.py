@@ -266,40 +266,51 @@ def define_calories(weight: int, goal_calories: float):
 
     dietary_type = st.selectbox("Select your dietary type", ["", "vegetarian", "vegan", "pescatarian", "keto", "paleo", "gluten-free", "dairy-free"])
 
+    # Allow the user to upload an image file of their fridge, accepting jpg, jpeg, and png formats
     image = st.file_uploader("Upload a picture of your fridge", type=["jpg", "jpeg", "png"])
+    
+    # Check if an image has been uploaded
     if image is not None:
+        # Display the uploaded image with a caption
         st.image(image, caption='Uploaded Fridge Image')
 
+    # Initialize an empty list to store AI-suggested food items
     food_ai = []
+    
+    # If an image has been uploaded, proceed with AI analysis
     if image is not None:
+        # Create an instance of the OpenAI client
         client = OpenAI()
 
-        # Encode the uploaded image
+        # Convert the uploaded image to a base64-encoded string
         base64_image = base64.b64encode(image.read()).decode('utf-8')
 
+        # Send a request to the OpenAI API to analyze the image and suggest ingredients
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o-mini",  # Specify the model to use
             messages=[
                 {
-                    "role": "user",
+                    "role": "user",  # Define the role of the message sender
                     "content": [
                         {
-                            "type": "text",
+                            "type": "text",  # Specify the type of content as text
                             "text": "analyze the fridge content and give me three diverse items as a comma separated lower-case list which might fit as a recipe. Only use single word ingredient names",
                         },
                         {
-                            "type": "image_url",
+                            "type": "image_url",  # Specify the type of content as an image URL
                             "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
+                                "url": f"data:image/jpeg;base64,{base64_image}"  # Provide the base64-encoded image URL
                             },
                         },
                     ],
-                    "temperature": 0.0
+                    "temperature": 0.0  # Set the temperature for deterministic output
                 }
             ],
         )
-
+        # Extract the content of the AI response, which contains the suggested ingredients
         food_ai = response.choices[0].message.content
+        
+        # Display the detected ingredients on the Streamlit app interface
         st.write(f"Ingredients detected: {food_ai}")
 
     food = st.text_input("What other ingredients do you want to use for cooking?", placeholder="chicken, beans")
