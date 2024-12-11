@@ -147,7 +147,7 @@ def set_fitness_goal(weight: int, bmr: float):
     # Step 2.1: Select fitness goal out of 3 options and target
     fitness_goal = st.selectbox("Choose your fitness goal", ["Lose weight", "Maintain weight", "Gain weight"])
 
-    if fitness_goal in ["Lose weight", "Gain weight "]: # Target amount and time period needed if lose or gain 
+    if fitness_goal in ["Lose weight", "Gain weight"]: # Target amount and time period needed if lose or gain 
         target_amount = st.number_input("Enter your target weight change in kg", step=0.1)
         time_period = st.number_input("Enter your target time period in weeks", min_value=1, step=1)
     else:
