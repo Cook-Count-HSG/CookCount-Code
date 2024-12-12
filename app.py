@@ -347,22 +347,6 @@ def define_calories(weight: int, goal_calories: float):
                 st.markdown("**Instructions:**")
                 st.write("\n".join([f"{step['display_text']}" for step in recipe["instructions"]]))
 
-                #Preparing recipies as JSON formate
-                recipe_to_save = {
-                    "name": recipe["name"],
-                    "description": recipe["description"],
-                    "prep_time_minutes": recipe["prep_time_minutes"],
-                    "total_time_minutes": recipe["total_time_minutes"],
-                    "num_servings": recipe["num_servings"],
-                    "nutrition": recipe["nutrition"],
-                    "thumbnail_url": recipe["thumbnail_url"],
-                    "instructions": [step["display_text"] for step in recipe["instructions"]]
-                }
-
-                #Saving JSONs in recipies folder
-                with open(f"recipies/{recipe['name']}.json", "w") as f:
-                    json.dump(recipe_to_save, f)
-
                 recipe_calories = goal_calories - recipe['nutrition']['calories']
                 st.write(f"Updated goal calories for the day: {recipe_calories:.2f} kcal")
 
