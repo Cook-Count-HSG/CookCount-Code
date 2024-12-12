@@ -134,7 +134,7 @@ def create_user_profile():
         fig.update_layout(legend_title_text='BMI Level')
 
         # Display the chart in streamlit
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, key="BMI Chart")
 
         # Save user profile in json file
         with open("data/user_profile.json", "w") as f:
@@ -237,7 +237,7 @@ def set_fitness_goal(weight: int, bmr: float):
         )
 
         # Display the chart in streamlit
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, key="Fitness Goal Chart")
 
         # Step 2.8: Save fitness goal and calorie adjustment in json file
         fitness_data = {
@@ -385,7 +385,7 @@ def define_calories(weight: int, goal_calories: float):
                 )
 
                 # Display the chart in streamlit
-                st.plotly_chart(fig)
+                st.plotly_chart(fig, key=f"Chart {recipe["name"]}")
 
 # Frontend logic to control the flow of the app
 if st.session_state['mode'] == "create_user_profile":
