@@ -1,0 +1,5 @@
+streamlit
+openai>=1.57.2
+pandas
+plotly.express
+requests
