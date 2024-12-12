@@ -6,7 +6,7 @@ The file begins by importing necessary libraries such as streamlit, pandas, plot
 It sets up an API key for OpenAI, which is used for analyzing images of fridge contents.
 2. User Interface with Streamlit:
 Streamlit is a library that allows for the creation of web apps with Python. It is used here to create a user-friendly interface.
-Session State:
+3. Session State:
 The app uses st.session_state to keep track of the user's progress through different steps: creating a user profile, setting a fitness goal, and defining calories for recipes.
 4. Functions:
 searchapi: This function searches for recipes using the Tasty API based on user input and dietary preferences.
@@ -16,9 +16,9 @@ suggest_recipes_api: This function suggests recipes using the Tasty API based on
 define_calories: This function helps users find recipes that fit within their caloric goals. It can also analyze a picture of the user's fridge to suggest ingredients.
 5. Flow Control:
 The app controls the flow using conditional statements based on the session_state. It guides the user through the steps of creating a profile, setting a fitness goal, and getting recipe suggestions.
-Data Storage:
+6. Data Storage:
 User profiles and fitness goals are saved as JSON files, allowing the app to remember user data between sessions.
-Visualization:
+7. Visualization:
 The app uses Plotly to create interactive charts, such as bar charts for BMI and pie charts for macronutrient distribution.
 How It Works:
 Step 1: Users create a profile by entering personal details. The app calculates and displays their BMI and BMR.
