@@ -77,6 +77,7 @@ def create_user_profile():
             "name": f"{first_name} {last_name}",
             "age": age,
             "gender": gender,
+            "weight": weight,
             "BMI": bmi,
             "BMR": bmr
         }
@@ -201,6 +202,7 @@ def set_fitness_goal(weight: int, bmr: float):
         st.write(f"To reach your fitness goal, your daily calorie target should be: {goal_calories:.2f} calories.")
 
         # Calculate daily protein, fat and carbs intake in grams based on the goal calories
+
         protein = round(1.5 * weight)
         protein_kcals = protein * 5.1
         fat = round(0.7 * weight)
@@ -361,15 +363,15 @@ def define_calories(weight: int, goal_calories: float):
                 with open(f"recipies/{recipe['name']}.json", "w") as f:
                     json.dump(recipe_to_save, f)
 
-                goal_calories -= recipe['nutrition']['calories']
-                st.write(f"Updated goal calories for the day: {goal_calories:.2f} kcal")
+                recipe_calories = goal_calories - recipe['nutrition']['calories']
+                st.write(f"Updated goal calories for the day: {recipe_calories:.2f} kcal")
 
                 # Calculate daily protein, fat and carbs intake in grams based on the goal calories
                 protein = round(1.5 * weight)
                 protein_kcals = protein * 5.1
                 fat = round(0.7 * weight)
                 fat_kcals = fat * 9
-                carbs_kcals = goal_calories - protein_kcals - fat_kcals
+                carbs_kcals = recipe_calories - protein_kcals - fat_kcals
                 carbs = round(carbs_kcals / 5.1)
 
                 # Create a dataframe to be used in the pie chart
@@ -383,7 +385,7 @@ def define_calories(weight: int, goal_calories: float):
                     df,
                     values='Calories',
                     names='Type',
-                    title=f'Updated grams left of Protein, Fat and Carbs for a {goal_calories:.2f} Calorie Diet',
+                    title=f'Updated grams left of Protein, Fat and Carbs for a {recipe_calories:.2f} Calorie Diet',
                     category_orders={"Type": df["Type"].tolist()},
                     width=650,
                     height=400
@@ -407,10 +409,10 @@ if st.session_state['mode'] == "create_user_profile":
 elif st.session_state['mode'] == "set_fitness_goal":
     with open("data/user_profile.json", "r") as f:
         user_profile = json.load(f)
-    set_fitness_goal(weight=user_profile['BMI'], bmr=user_profile['BMR'])
+    set_fitness_goal(weight=user_profile['weight'], bmr=user_profile['BMR'])
 elif st.session_state['mode'] == "define_calories":
     with open("data/user_profile.json", "r") as f:
         user_profile = json.load(f)
     with open("data/fitness_goal.json", "r") as f:
         fitness_goal = json.load(f)
-    define_calories(weight=user_profile['BMI'], goal_calories=fitness_goal['goal_calories'])
+    define_calories(weight=user_profile['weight'], goal_calories=fitness_goal['goal_calories'])
