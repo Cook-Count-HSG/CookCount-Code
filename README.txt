@@ -1,5 +1,5 @@
 Overview of app.py
-This file is part of a Streamlit application called CookCount, which serves as a personal nutrition and recipe assistant. The application helps users create a profile, set fitness goals, and get recipe suggestions based on their dietary preferences and caloric needs.
+This file is part of a Streamlit application called CookandCount, which serves as a personal nutrition and recipe assistant. The application helps users create a profile, set fitness goals, and get recipe suggestions based on their dietary preferences and caloric needs.
 Key Components:
 1. Imports and Setup:
 The file begins by importing necessary libraries such as streamlit, pandas, plotly, and requests.
