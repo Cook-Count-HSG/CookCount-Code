@@ -31,6 +31,7 @@ def searchapi(food, dietary_type):
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
 
+    #Defining common emojis
     common_emojis = {
         "vegetarian": "🥗",
         "vegan": "🌱",
@@ -43,6 +44,7 @@ def searchapi(food, dietary_type):
 
     results = data.get("results", [])
 
+    #Returning the results
     for result in results:
         if dietary_type != "":
             result["name"] = result.get("name", "") + " " + common_emojis[dietary_type]
@@ -323,6 +325,7 @@ def define_calories(weight: int, goal_calories: float):
 
     food = food.replace(" ", "")
 
+    #API request to gather recipies fitting the user prefrences
     recipes = suggest_recipes_api(food, dietary_type)
     recipes = [recipe for recipe in recipes if recipe['nutrition'].get('calories', -1) < calories and recipe['nutrition'].get('calories', -1) > 0]
 
@@ -331,6 +334,7 @@ def define_calories(weight: int, goal_calories: float):
 
         for i, recipe in enumerate(recipes):
             with st.expander(recipe["name"]):
+                #Displying the result recipies to the user
                 st.image(recipe["thumbnail_url"], caption=recipe["name"])
                 st.markdown(f"**Description:** {recipe['description']}")
                 st.markdown(f"**Prep Time:** {recipe['prep_time_minutes']} minutes")
@@ -341,6 +345,7 @@ def define_calories(weight: int, goal_calories: float):
                 st.markdown("**Instructions:**")
                 st.write("\n".join([f"{step['display_text']}" for step in recipe["instructions"]]))
 
+                #Preparing recipies as JSON formate
                 recipe_to_save = {
                     "name": recipe["name"],
                     "description": recipe["description"],
@@ -352,6 +357,7 @@ def define_calories(weight: int, goal_calories: float):
                     "instructions": [step["display_text"] for step in recipe["instructions"]]
                 }
 
+                #Saving JSONs in recipies folder
                 with open(f"recipies/{recipe['name']}.json", "w") as f:
                     json.dump(recipe_to_save, f)
 
