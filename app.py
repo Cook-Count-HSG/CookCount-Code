@@ -51,22 +51,22 @@ def searchapi(food, dietary_type):
 
 # Step 1: User Profile Creation and BMI/BMR calculation
 def create_user_profile():
-    st.header("Create User Profile (Step 1/3)")
-    first_name = st.text_input("Enter your first name")
-    last_name = st.text_input("Enter your last name")
-    gender = st.selectbox("Select your gender", ["Male", "Female"])
-    age = st.number_input("Enter your age", min_value=1, step=1)
-    weight = st.number_input("Enter your weight in kg", min_value=0.1, step=0.1)
-    height = st.number_input("Enter your height in cm", min_value=0.1, step=0.1)
+    st.header("Create User Profile (Step 1/3)") # Insert header
+    first_name = st.text_input("Enter your first name") # Insert first name 
+    last_name = st.text_input("Enter your last name") # Insert last name 
+    gender = st.selectbox("Select your gender", ["Male", "Female"]) # Select your gender
+    age = st.number_input("Enter your age", min_value=1, step=1) # Insert age 
+    weight = st.number_input("Enter your weight in kg", min_value=0.1, step=0.1) # Insert weight 
+    height = st.number_input("Enter your height in cm", min_value=0.1, step=0.1) # Insert height 
 
-    if st.button("Save Profile"):
-        bmi = weight / ((height / 100) ** 2)
+    if st.button("Save Profile"): # Saving your User Profile and Calucation of BMI and BMR 
+        bmi = weight / ((height / 100) ** 2) # BMI formula
 
         def calculate_bmr(gender, weight, height, age):
             if gender.lower() == "male":
-                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age) #BMR formula male 
             else:
-                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age) #BMR formula female 
             return bmr
 
         bmr = calculate_bmr(gender, weight, height, age)
@@ -79,7 +79,7 @@ def create_user_profile():
             "BMR": bmr
         }
 
-        # Display user profile
+        # Display User Profile with BMI and BMR
         st.write("Profile is saved!")
         st.write(f"Your BMI is **{bmi:.2f}** and your BMR is **{bmr:.2f}**")
 
@@ -142,12 +142,12 @@ def create_user_profile():
 
 # Step 2: Fitness Goal and Calorie Adjustment based on PAL, Exercise and Calorie Goal
 def set_fitness_goal(weight: int, bmr: float):
-    st.header("Set Your Fitness Goal (Step 2/3)")
+    st.header("Set Your Fitness Goal (Step 2/3)") # Insert header
 
     # Step 2.1: Select fitness goal out of 3 options and target
     fitness_goal = st.selectbox("Choose your fitness goal", ["Lose weight", "Maintain weight", "Gain weight"])
 
-    if fitness_goal in ["Lose weight", "Gain weight "]:
+    if fitness_goal in ["Lose weight", "Gain weight"]: # Target amount and time period needed if lose or gain 
         target_amount = st.number_input("Enter your target weight change in kg", step=0.1)
         time_period = st.number_input("Enter your target time period in weeks", min_value=1, step=1)
     else:
@@ -266,40 +266,51 @@ def define_calories(weight: int, goal_calories: float):
 
     dietary_type = st.selectbox("Select your dietary type", ["", "vegetarian", "vegan", "pescatarian", "keto", "paleo", "gluten-free", "dairy-free"])
 
+    # Allow the user to upload an image file of their fridge, accepting jpg, jpeg, and png formats
     image = st.file_uploader("Upload a picture of your fridge", type=["jpg", "jpeg", "png"])
+    
+    # Check if an image has been uploaded
     if image is not None:
+        # Display the uploaded image with a caption
         st.image(image, caption='Uploaded Fridge Image')
 
+    # Initialize an empty list to store AI-suggested food items
     food_ai = []
+    
+    # If an image has been uploaded, proceed with AI analysis
     if image is not None:
+        # Create an instance of the OpenAI client
         client = OpenAI()
 
-        # Encode the uploaded image
+        # Convert the uploaded image to a base64-encoded string
         base64_image = base64.b64encode(image.read()).decode('utf-8')
 
+        # Send a request to the OpenAI API to analyze the image and suggest ingredients
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o-mini",  # Specify the model to use
             messages=[
                 {
-                    "role": "user",
+                    "role": "user",  # Define the role of the message sender
                     "content": [
                         {
-                            "type": "text",
+                            "type": "text",  # Specify the type of content as text
                             "text": "analyze the fridge content and give me three diverse items as a comma separated lower-case list which might fit as a recipe. Only use single word ingredient names",
                         },
                         {
-                            "type": "image_url",
+                            "type": "image_url",  # Specify the type of content as an image URL
                             "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
+                                "url": f"data:image/jpeg;base64,{base64_image}"  # Provide the base64-encoded image URL
                             },
                         },
                     ],
-                    "temperature": 0.0
+                    "temperature": 0.0  # Set the temperature for deterministic output
                 }
             ],
         )
-
+        # Extract the content of the AI response, which contains the suggested ingredients
         food_ai = response.choices[0].message.content
+        
+        # Display the detected ingredients on the Streamlit app interface
         st.write(f"Ingredients detected: {food_ai}")
 
     food = st.text_input("What other ingredients do you want to use for cooking?", placeholder="chicken, beans")
