@@ -1,5 +1,4 @@
 import json
-from turtle import right
 import streamlit as st
 import pandas as pd
 import plotly.express as px
